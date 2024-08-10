@@ -1,0 +1,59 @@
+2024-08-10 13:59:18,622 - ERROR - Unexpected error in main loop: 'SimpleRAGChatbot' object has no attribute 'process_input'
+2024-08-10 14:11:07,251 - ERROR - Error in chatbot processing: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - '/home/viceadmiral/nltk_data'
+    - '/home/viceadmiral/mini_rag/new_rag_env/nltk_data'
+    - '/home/viceadmiral/mini_rag/new_rag_env/share/nltk_data'
+    - '/home/viceadmiral/mini_rag/new_rag_env/lib/nltk_data'
+    - '/usr/share/nltk_data'
+    - '/usr/local/share/nltk_data'
+    - '/usr/lib/nltk_data'
+    - '/usr/local/lib/nltk_data'
+**********************************************************************
+
+2024-08-10 14:15:37,678 - ERROR - Error in chatbot processing: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - '/home/viceadmiral/nltk_data'
+    - '/home/viceadmiral/mini_rag/new_rag_env/nltk_data'
+    - '/home/viceadmiral/mini_rag/new_rag_env/share/nltk_data'
+    - '/home/viceadmiral/mini_rag/new_rag_env/lib/nltk_data'
+    - '/usr/share/nltk_data'
+    - '/usr/local/share/nltk_data'
+    - '/usr/lib/nltk_data'
+    - '/usr/local/lib/nltk_data'
+**********************************************************************
+
+2024-08-10 15:38:18,576 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 15:46:23,604 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 15:55:12,020 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 16:10:35,525 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 16:16:09,171 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 16:29:02,638 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 16:52:29,230 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 16:56:18,184 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 17:29:44,332 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 17:30:35,262 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 17:32:38,642 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
+2024-08-10 17:40:21,735 - ERROR - Unexpected error in main loop: [Errno -9981] Input overflowed
