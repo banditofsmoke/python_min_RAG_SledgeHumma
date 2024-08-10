@@ -66,3 +66,8 @@
 2024-08-10 23:39:34,196 - ERROR - Unexpected error in main loop: name 'os' is not defined
 2024-08-10 23:40:30,505 - ERROR - Unexpected error in main loop: name 'os' is not defined
 2024-08-10 23:46:28,038 - ERROR - Unexpected error in main loop: 'function' object has no attribute 'list_all_documents'
+2024-08-11 00:35:31,457 - ERROR - Critical error: asyncio.run() cannot be called from a running event loop
+2024-08-11 01:04:35,390 - ERROR - Unexpected error in main loop: addwstr() returned ERR
+2024-08-11 01:07:47,308 - ERROR - Unexpected error in main loop: addwstr() returned ERR
+2024-08-11 01:07:51,838 - ERROR - Unexpected error in main loop: addwstr() returned ERR
+2024-08-11 01:07:55,246 - ERROR - Unexpected error in main loop: addwstr() returned ERR

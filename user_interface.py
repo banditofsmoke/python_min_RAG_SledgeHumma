@@ -1,143 +1,166 @@
-from prompt_toolkit import Application
-from prompt_toolkit.layout.containers import Window, HSplit
-from prompt_toolkit.layout.controls import FormattedTextControl
-from prompt_toolkit.layout import Layout
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.widgets import TextArea
-from prompt_toolkit.application import get_app
-from config import ITEMS_PER_PAGE
+import curses
+import asyncio
+from curses.textpad import Textbox, rectangle
+import locale
 
-def select_document(documents, title):
-    selected_index = [0]
-    page = [0]
-    search_query = ['']
-    sort_by = ['timestamp']
-    sort_order = ['desc']
-    exit_flag = [False]
+# Set locale for proper Unicode handling
+locale.setlocale(locale.LC_ALL, '')
 
-    def get_formatted_text():
-        result = []
-        result.append(('bold', f"{title}\n\n"))
+def safe_addstr(stdscr, y, x, string, attr=0):
+    height, width = stdscr.getmaxyx()
+    if y < height and x < width:
+        try:
+            stdscr.addstr(y, x, string[:width-x-1], attr)
+        except curses.error:
+            pass
+
+class AIThemedInterface:
+    def __init__(self):
+        self.menu_items = [
+            "Add text document", "Add PDF document", "Search documents",
+            "List all documents", "Record and transcribe audio", "Play audio",
+            "List all audio files", "Delete document", "Delete audio file",
+            "NLP mode", "Speech interaction mode", "Chatbot mode",
+            "Advanced document management", "Exit"
+        ]
+        self.selected_item = 0
+
+    def draw_menu(self, stdscr):
+        stdscr.clear()
+        height, width = stdscr.getmaxyx()
         
-        filtered_docs = [doc for doc in documents if search_query[0].lower() in doc['content'].lower()]
-        filtered_docs.sort(key=lambda x: x[sort_by[0]], reverse=(sort_order[0] == 'desc'))
+        # Draw title
+        title = "Enhanced RAG System"
+        safe_addstr(stdscr, 0, (width - len(title)) // 2, title, curses.color_pair(2) | curses.A_BOLD)
         
-        start = page[0] * ITEMS_PER_PAGE
-        end = start + ITEMS_PER_PAGE
-        current_page_docs = filtered_docs[start:end]
-        
-        for i, doc in enumerate(current_page_docs, start=start):
-            if i == selected_index[0]:
-                result.append(('reverse', f"> {doc['timestamp']}: {doc['content'][:50]}... [{doc.get('category', 'N/A')}]\n"))
+        # Draw menu items
+        for idx, item in enumerate(self.menu_items):
+            x = width // 4 if idx < len(self.menu_items) // 2 else 3 * width // 4
+            y = 2 + (idx % (len(self.menu_items) // 2))
+            if idx == self.selected_item:
+                safe_addstr(stdscr, y, x - len(item) // 2 - 2, f"> {item} <", curses.color_pair(1) | curses.A_BOLD)
             else:
-                category_color = {
-                    'default': '',
-                    'important': '#ansired',
-                    'personal': '#ansigreen',
-                    'work': '#ansiblue'
-                }.get(doc.get('category', 'default'), '')
-                result.append((category_color, f"  {doc['timestamp']}: {doc['content'][:50]}... [{doc.get('category', 'N/A')}]\n"))
+                safe_addstr(stdscr, y, x - len(item) // 2, item)
         
-        result.append(('', f"\nPage {page[0] + 1}/{(len(filtered_docs) - 1) // ITEMS_PER_PAGE + 1}"))
-        result.append(('', "\nPress 'q' to return to main menu"))
-        return result
+        # Draw AI-themed elements
+        for i in range(height):
+            safe_addstr(stdscr, i, 0, "█", curses.color_pair(3))
+            safe_addstr(stdscr, i, width-1, "█", curses.color_pair(3))
+        
+        safe_addstr(stdscr, height-1, 0, "█" * width, curses.color_pair(3))
+        safe_addstr(stdscr, height-2, 2, "Use arrow keys to navigate, Enter to select, 'q' to quit", curses.color_pair(4))
 
-    def update_search(text):
-        search_query[0] = text
-        page[0] = 0
-        selected_index[0] = 0
+    async def run(self, stdscr):
+        curses.curs_set(0)
+        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_CYAN)
+        curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLACK)
+        curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
 
-    search_field = TextArea(
-        height=1,
-        prompt='Search: ',
-        multiline=False,
-        wrap_lines=False,
-        accept_handler=update_search
-    )
+        while True:
+            self.draw_menu(stdscr)
+            stdscr.refresh()
 
-    kb = KeyBindings()
+            key = stdscr.getch()
 
-    @kb.add('up')
-    def _(event):
-        selected_index[0] = (selected_index[0] - 1) % len(documents)
+            if key == ord('q'):
+                return "Exit"
+            elif key == curses.KEY_UP:
+                self.selected_item = (self.selected_item - 1) % len(self.menu_items)
+            elif key == curses.KEY_DOWN:
+                self.selected_item = (self.selected_item + 1) % len(self.menu_items)
+            elif key in [curses.KEY_ENTER, ord('\n')]:
+                return self.menu_items[self.selected_item]
 
-    @kb.add('down')
-    def _(event):
-        selected_index[0] = (selected_index[0] + 1) % len(documents)
+            # Debug information
+            debug_info = f"Last key: {key}"
+            safe_addstr(stdscr, stdscr.getmaxyx()[0]-1, 2, debug_info.ljust(stdscr.getmaxyx()[1]-3), curses.color_pair(4))
 
-    @kb.add('pageup')
-    def _(event):
-        page[0] = max(0, page[0] - 1)
+            await asyncio.sleep(0.1)
 
-    @kb.add('pagedown')
-    def _(event):
-        page[0] = min((len(documents) - 1) // ITEMS_PER_PAGE, page[0] + 1)
+async def display_menu():
+    interface = AIThemedInterface()
+    return await curses.wrapper(interface.run)
 
-    @kb.add('enter')
-    def _(event):
-        event.app.exit()
+async def show_message(stdscr, title, message):
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    safe_addstr(stdscr, height//2 - 2, max(0, (width - len(title))//2), title, curses.A_BOLD)
+    safe_addstr(stdscr, height//2, max(0, (width - len(message))//2), message)
+    safe_addstr(stdscr, height//2 + 2, max(0, (width - 20)//2), "Press any key to continue")
+    stdscr.refresh()
+    stdscr.getch()
 
-    @kb.add('q')
-    def _(event):
-        exit_flag[0] = True
-        event.app.exit()
+async def get_confirmation(stdscr, title, message):
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    safe_addstr(stdscr, height//2 - 2, max(0, (width - len(title))//2), title, curses.A_BOLD)
+    safe_addstr(stdscr, height//2, max(0, (width - len(message))//2), message)
+    safe_addstr(stdscr, height//2 + 2, max(0, (width - 35)//2), "Press 'y' to confirm, any other key to cancel")
+    stdscr.refresh()
+    key = stdscr.getch()
+    return key == ord('y')
 
-    @kb.add('c-d')
-    def _(event):
-        if 0 <= selected_index[0] < len(documents):
-            documents.pop(selected_index[0])
-            selected_index[0] = min(selected_index[0], len(documents) - 1)
+async def get_input(stdscr, title, prompt):
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    safe_addstr(stdscr, height//2 - 2, max(0, (width - len(title))//2), title, curses.A_BOLD)
+    safe_addstr(stdscr, height//2, 2, prompt)
+    editwin = curses.newwin(1, width-4, height//2+1, 2)
+    rectangle(stdscr, height//2, 1, height//2+2, width-2)
+    stdscr.refresh()
 
-    @kb.add('c-e')
-    def _(event):
-        if 0 <= selected_index[0] < len(documents):
-            doc = documents[selected_index[0]]
-            new_content = input(f"Edit document content (current: {doc['content']}): ")
-            if new_content:
-                doc['content'] = new_content
+    box = Textbox(editwin)
+    stdscr.refresh()
+    box.edit()
+    return box.gather().strip()
 
-    @kb.add('c-s')
-    def _(event):
-        nonlocal sort_by, sort_order
-        sort_options = ['timestamp', 'content', 'category']
-        current_index = sort_options.index(sort_by[0])
-        sort_by[0] = sort_options[(current_index + 1) % len(sort_options)]
-        if sort_by[0] != sort_options[current_index]:
-            sort_order[0] = 'desc'
-        else:
-            sort_order[0] = 'asc' if sort_order[0] == 'desc' else 'desc'
+async def select_document(stdscr, documents, title):
+    curses.curs_set(0)
+    current_idx = 0
+    start_idx = 0
+    height, width = stdscr.getmaxyx()
+    max_display = height - 4
 
-    root_container = HSplit([
-        search_field,
-        Window(content=FormattedTextControl(get_formatted_text)),
-    ])
+    while True:
+        stdscr.clear()
+        safe_addstr(stdscr, 0, max(0, (width - len(title)) // 2), title, curses.A_BOLD)
 
-    layout = Layout(root_container)
+        for idx, doc in enumerate(documents[start_idx:start_idx+max_display], start=start_idx):
+            if idx == current_idx:
+                safe_addstr(stdscr, idx-start_idx+2, 2, f"> {doc['content'][:50]}...", curses.A_REVERSE)
+            else:
+                safe_addstr(stdscr, idx-start_idx+2, 2, f"  {doc['content'][:50]}...")
 
-    application = Application(
-        layout=layout,
-        key_bindings=kb,
-        full_screen=True
-    )
+        safe_addstr(stdscr, height-1, 2, "Use arrow keys to navigate, Enter to select, 'q' to quit")
+        stdscr.refresh()
 
-    application.run()
-    
-    if exit_flag[0]:
-        return None
-    return documents[selected_index[0]]
+        key = stdscr.getch()
 
-def display_menu():
-    print("\n1. Add text document")
-    print("2. Add PDF document")
-    print("3. Search documents")
-    print("4. List all documents")
-    print("5. Record and transcribe audio")
-    print("6. Play audio")
-    print("7. List all audio files")
-    print("8. Delete document")
-    print("9. Delete audio file")
-    print("10. NLP mode")
-    print("11. Speech interaction mode")
-    print("12. Chatbot mode")
-    print("13. Exit")
-    return input("Enter your choice: ")
+        if key == ord('q'):
+            return None
+        elif key == curses.KEY_UP and current_idx > 0:
+            current_idx -= 1
+            if current_idx < start_idx:
+                start_idx = current_idx
+        elif key == curses.KEY_DOWN and current_idx < len(documents) - 1:
+            current_idx += 1
+            if current_idx >= start_idx + max_display:
+                start_idx = current_idx - max_display + 1
+        elif key in [curses.KEY_ENTER, ord('\n')]:
+            return documents[current_idx]
+
+        await asyncio.sleep(0.1)
+
+# Wrapper functions to use with asyncio.run()
+async def show_message_wrapper(title, message):
+    return await curses.wrapper(lambda stdscr: show_message(stdscr, title, message))
+
+async def get_confirmation_wrapper(title, message):
+    return await curses.wrapper(lambda stdscr: get_confirmation(stdscr, title, message))
+
+async def get_input_wrapper(title, prompt):
+    return await curses.wrapper(lambda stdscr: get_input(stdscr, title, prompt))
+
+async def select_document_wrapper(documents, title):
+    return await curses.wrapper(lambda stdscr: select_document(stdscr, documents, title))
