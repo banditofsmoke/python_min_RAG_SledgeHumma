@@ -1,4 +1,5 @@
 import os
+from cryptography.fernet import Fernet
 
 # Database
 DB_FILE = 'documents.json'
@@ -22,3 +23,7 @@ SPACY_MODEL = 'en_core_web_sm'
 
 # UI
 ITEMS_PER_PAGE = 10
+
+# Encryption
+ENCRYPTION_KEY = Fernet.generate_key()  # Generate a new key each time the app starts
+# For persistent key, you might want to store this securely and load it instead of generating new each time

@@ -1,6 +1,11 @@
 import logging
 import os
 import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
 
 def setup_logging():
     logging.basicConfig(filename='mini_rag.log', level=logging.ERROR, 
@@ -24,3 +29,8 @@ def is_valid_pdf(file_path):
 def text_input_alternative():
     print("Audio recording failed. Please enter your message as text:")
     return input("Your message: ")
+
+def preprocess_text(text):
+    tokens = word_tokenize(text.lower())
+    stop_words = set(stopwords.words('english'))
+    return [word for word in tokens if word.isalnum() and word not in stop_words]
