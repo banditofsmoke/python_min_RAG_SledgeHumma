@@ -71,3 +71,6 @@
 2024-08-11 01:07:47,308 - ERROR - Unexpected error in main loop: addwstr() returned ERR
 2024-08-11 01:07:51,838 - ERROR - Unexpected error in main loop: addwstr() returned ERR
 2024-08-11 01:07:55,246 - ERROR - Unexpected error in main loop: addwstr() returned ERR
+2024-08-11 01:55:32,764 - ERROR - Error adding document: Object of type bytes is not JSON serializable
+2024-08-11 01:55:33,156 - ERROR - Error adding document: Object of type bytes is not JSON serializable
+2024-08-11 02:36:05,460 - ERROR - Error adding document: Object of type bytes is not JSON serializable

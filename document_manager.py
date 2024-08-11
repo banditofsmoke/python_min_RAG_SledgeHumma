@@ -7,6 +7,7 @@ from config import DB_FILE, ENCRYPTION_KEY
 from utils import get_absolute_path, is_valid_pdf, preprocess_text
 from fuzzywuzzy import fuzz
 from cryptography.fernet import Fernet
+import os
 
 db = TinyDB(DB_FILE)
 

@@ -72,15 +72,7 @@ class AIThemedInterface:
             elif key in [curses.KEY_ENTER, ord('\n')]:
                 return self.menu_items[self.selected_item]
 
-            # Debug information
-            debug_info = f"Last key: {key}"
-            safe_addstr(stdscr, stdscr.getmaxyx()[0]-1, 2, debug_info.ljust(stdscr.getmaxyx()[1]-3), curses.color_pair(4))
-
             await asyncio.sleep(0.1)
-
-async def display_menu():
-    interface = AIThemedInterface()
-    return await curses.wrapper(interface.run)
 
 async def show_message(stdscr, title, message):
     stdscr.clear()
@@ -111,12 +103,12 @@ async def get_input(stdscr, title, prompt):
     stdscr.refresh()
 
     box = Textbox(editwin)
-    stdscr.refresh()
+    curses.curs_set(1)
     box.edit()
+    curses.curs_set(0)
     return box.gather().strip()
 
 async def select_document(stdscr, documents, title):
-    curses.curs_set(0)
     current_idx = 0
     start_idx = 0
     height, width = stdscr.getmaxyx()
@@ -151,16 +143,3 @@ async def select_document(stdscr, documents, title):
             return documents[current_idx]
 
         await asyncio.sleep(0.1)
-
-# Wrapper functions to use with asyncio.run()
-async def show_message_wrapper(title, message):
-    return await curses.wrapper(lambda stdscr: show_message(stdscr, title, message))
-
-async def get_confirmation_wrapper(title, message):
-    return await curses.wrapper(lambda stdscr: get_confirmation(stdscr, title, message))
-
-async def get_input_wrapper(title, prompt):
-    return await curses.wrapper(lambda stdscr: get_input(stdscr, title, prompt))
-
-async def select_document_wrapper(documents, title):
-    return await curses.wrapper(lambda stdscr: select_document(stdscr, documents, title))
