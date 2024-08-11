@@ -3,7 +3,7 @@
 ![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-Welcome to the Enhanced Minimalist RAG (Retrieval-Augmented Generation) System! This project showcases a robust document management and natural language processing system built entirely with Python.
+Welcome to the Enhanced Minimalist RAG (Retrieval-Augmented Generation) System! This project showcases a robust document management and natural language processing system built entirely with Python. This is the result of a 23 hour sprint. I tap here. Goodnight. Python ONLY. Have fun. GG, you legends. Sledge.
 
 ## 🌟 Project Overview
 
@@ -266,7 +266,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - PyAudio and SpeechRecognition library developers
 
 Special thanks to the open-source community and all future contributors!
-
+To my mentor, wwww.github.com/sebdg, thanks for just being a legend - oh, and the UI help.
 ## 📬 Contact Information
 
 For questions, suggestions, or collaborations, please reach out:
